@@ -1,22 +1,54 @@
 package models
 
-import "time"
+import (
+	"ginmx2/db"
+	"time"
+)
 
 type Note struct {
-	ID       int       `json:"id"`
-	Title    string    `binding:"required" json:"title"`
-	Body     string    `binding:"required" json:"body"`
+	ID       int64
+	Title    string    `binding:"required"`
+	Body     string    `binding:"required"`
 	DateTime time.Time `binding:"required"`
+	Customer string    `binding:"required"`
 	UserID   int
 }
 
-var notes = []Note{}
+var notes []Note
 
-func (n Note) Save() {
-	// TODO save note to database
-	notes = append(notes, n)
+func (n Note) Save() error {
+	query := `
+	INSERT INTO notes (title, body, date_time, customer, user_id) 
+	VALUES (?, ?, ?, ?, ?)` // ? is a placeholder for the actual value provides sql injection protection apparently
+	data, err := db.DB.Prepare(query)
+	if err != nil {
+		return err
+	}
+	defer data.Close()
+	result, err := data.Exec(n.Title, n.Body, n.DateTime, n.Customer, n.UserID) // If you have a query to change things use Exec, if you have a query to get things use Query
+	if err != nil {
+		return err
+	}
+	id, err := result.LastInsertId()
+	n.ID = id
+	return err
 }
 
-func GetAllNotes() []Note {
-	return notes
+func GetAllNotes() ([]Note, error) {
+	query := `SELECT * FROM notes`
+	data, err := db.DB.Query(query) // if you a query to fetch data use Query
+	if err != nil {
+		return nil, err
+	}
+	defer data.Close()
+	var notes []Note  // create a slice of notes to store Note(s) returned from the database
+	for data.Next() { // iterate through the data
+		var note Note // create a new note of type Note
+		err := data.Scan(&note.ID, &note.Title, &note.Body, &note.DateTime, &note.Customer, &note.UserID)
+		if err != nil {
+			return nil, err
+		}
+		notes = append(notes, note) // append to the notes slice
+	}
+	return notes, err
 }

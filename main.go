@@ -1,20 +1,24 @@
 package main
 
 import (
+	"ginmx2/db"
 	"ginmx2/models"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
 
 func main() {
-
+	db.InitDB()
 	gin.Default()
 	server := gin.Default()
 
 	server.GET("/ping", getPong)
 	server.GET("/notes", getNotes)
 	server.POST("/notes", createNote)
-	server.Run(":3000")
+	err := server.Run(":3000")
+	if err != nil {
+		panic(err)
+	}
 }
 
 func getPong(context *gin.Context) {
@@ -22,7 +26,11 @@ func getPong(context *gin.Context) {
 }
 
 func getNotes(context *gin.Context) {
-	notes := models.GetAllNotes()
+	notes, err := models.GetAllNotes()
+	if err != nil {
+		context.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch notes."})
+		return
+	}
 	context.JSON(http.StatusOK, notes) // gin.H is a shortcut for map[string]interface{} and is used to perform JSON response
 }
 
@@ -34,8 +42,13 @@ func createNote(context *gin.Context) {
 		context.JSON(http.StatusBadRequest, gin.H{"error": "Could not decode JSON"})
 		return
 	}
-
 	note.ID = 1
 	note.UserID = 1
+
+	err = note.Save()
+	if err != nil {
+		context.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to save note."})
+		return
+	}
 	context.JSON(http.StatusCreated, gin.H{"message": "Note created successfully", "note": note})
 }
