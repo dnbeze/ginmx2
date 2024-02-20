@@ -14,7 +14,7 @@ type Note struct {
 	UserID   int
 }
 
-var notes []Note
+//var notes []Note
 
 func (n Note) Save() error {
 	query := `
@@ -51,4 +51,15 @@ func GetAllNotes() ([]Note, error) {
 		notes = append(notes, note) // append to the notes slice
 	}
 	return notes, err
+}
+
+func GetNoteById(id int64) (*Note, error) { // *Note is a pointer to a Note for error handling purposes
+	query := `SELECT * FROM notes WHERE id = ?`
+	data := db.DB.QueryRow(query, id) // if you a query to fetch data use Query
+	var note Note
+	err := data.Scan(&note.ID, &note.Title, &note.Body, &note.DateTime, &note.Customer, &note.UserID)
+	if err != nil {
+		return nil, err
+	}
+	return &note, nil
 }
