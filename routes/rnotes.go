@@ -79,3 +79,22 @@ func updateNote(context *gin.Context) {
 	}
 	context.JSON(http.StatusOK, gin.H{"message": "Note updated successfully", "note": updatedNote})
 }
+
+func deleteNote(context *gin.Context) {
+	noteId, err := strconv.ParseInt(context.Param("id"), 10, 64) // get the id from the dynamic route /notes/:id and store it in the id variable
+	if err != nil {
+		context.JSON(http.StatusBadRequest, gin.H{"error": "Invalid note id"})
+		return
+	}
+	note, err := models.GetNoteById(noteId)
+	if err != nil {
+		context.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch note."})
+		return
+	}
+	err = note.Delete()
+	if err != nil {
+		context.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete note."})
+		return
+	}
+	context.JSON(http.StatusOK, gin.H{"message": "Note deleted successfully"})
+}

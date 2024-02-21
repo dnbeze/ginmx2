@@ -19,6 +19,21 @@ func InitDB() {
 }
 
 func createTables() {
+
+	// Create users table
+	createUsersTable := `
+	CREATE TABLE IF NOT EXISTS users (
+	    		id INTEGER PRIMARY KEY AUTOINCREMENT,
+	    		email TEXT NOT NULL UNIQUE, 
+	    		firstname TEXT NOT NULL,
+	    		lastname TEXT NOT NULL,
+	    		password TEXT NOT NULL
+	)`
+	_, err := DB.Exec(createUsersTable)
+	if err != nil {
+		panic("Issue creating users table")
+	}
+
 	createNotesTable := `
 	CREATE TABLE IF NOT EXISTS notes (
 		id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -26,10 +41,10 @@ func createTables() {
 		body TEXT NOT NULL,
 		date_time DATETIME NOT NULL,
 		customer TEXT NOT NULL,
-		user_id INTEGER 
-	)
-	`
-	_, err := DB.Exec(createNotesTable)
+		user_id INTEGER,
+	    FOREIGN KEY (user_id) REFERENCES users(id)
+	)`
+	_, err = DB.Exec(createNotesTable)
 	if err != nil {
 		panic("Issue creating notes table")
 	}

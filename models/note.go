@@ -76,3 +76,14 @@ func (n Note) UpdateNote() error {
 	_, err = data.Exec(n.Title, n.Body, n.DateTime, n.Customer, n.ID)
 	return err
 }
+
+func (n Note) Delete() error {
+	query := `DELETE FROM notes WHERE id = ?`
+	data, err := db.DB.Prepare(query)
+	if err != nil {
+		return err
+	}
+	defer data.Close()
+	_, err = data.Exec(n.ID)
+	return err
+}
