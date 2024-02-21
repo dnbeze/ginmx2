@@ -14,8 +14,6 @@ type Note struct {
 	UserID   int
 }
 
-//var notes []Note
-
 func (n Note) Save() error {
 	query := `
 	INSERT INTO notes (title, body, date_time, customer, user_id) 
@@ -62,4 +60,19 @@ func GetNoteById(id int64) (*Note, error) { // *Note is a pointer to a Note for 
 		return nil, err
 	}
 	return &note, nil
+}
+
+func (n Note) UpdateNote() error {
+	query := `
+	UPDATE notes 
+	SET title = ?, body = ?, date_time = ?, customer = ? 
+	WHERE id = ? 
+	` // WHERE id = ? is a condition to update the note with the id provided
+	data, err := db.DB.Prepare(query)
+	if err != nil {
+		return err
+	}
+	defer data.Close()
+	_, err = data.Exec(n.Title, n.Body, n.DateTime, n.Customer, n.ID)
+	return err
 }
