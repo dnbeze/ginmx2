@@ -1,6 +1,9 @@
 package models
 
-import "ginmx2/db"
+import (
+	"ginmx2/db"
+	"ginmx2/utils"
+)
 
 type User struct {
 	ID        int64
@@ -20,7 +23,11 @@ func (u User) Save() error {
 		return err
 	}
 	defer data.Close()
-	result, err := data.Exec(u.Email, u.Password, u.Firstname, u.Lastname)
+	hashpass, err := utils.HashPassword(u.Password)
+	if err != nil {
+		return err
+	}
+	result, err := data.Exec(u.Email, hashpass, u.Firstname, u.Lastname)
 	if err != nil {
 		return err
 	}
