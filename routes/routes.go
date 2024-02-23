@@ -10,4 +10,5 @@ func BuildRoutes(server *gin.Engine) {
 	server.PUT("/notes/:id", updateNote)    // UPDATE entry
 	server.DELETE("/notes/:id", deleteNote) // DELETE entry
 	server.POST("/signup", signup)          // new user
+	server.POST("/login", login)            // login
 }

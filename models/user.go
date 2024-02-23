@@ -1,6 +1,7 @@
 package models
 
 import (
+	"errors"
 	"ginmx2/db"
 	"ginmx2/utils"
 )
@@ -34,4 +35,20 @@ func (u User) Save() error {
 	userId, err := result.LastInsertId() // get the last inserted id performed by data.Exec() and store it in the userId variable
 	u.ID = userId                        // set the user id to the userId variable we got from the last inserted id
 	return err
+}
+
+func (u User) ValidateCredentials() error {
+	var queriedPassword string
+
+	query := `SELECT id, password FROM users WHERE email = ?`
+	data := db.DB.QueryRow(query, u.Email) // Passing query and specifying u.Email as the parameter to the query
+	err := data.Scan(&queriedPassword)
+	if err != nil {
+		return errors.New("invalid credentials")
+	}
+	passwordCheck := utils.VerifyPassword(queriedPassword, u.Password)
+	if !passwordCheck {
+		return errors.New("invalid credentials")
+	}
+	return nil
 }
