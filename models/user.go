@@ -10,8 +10,8 @@ type User struct {
 	ID        int64
 	Email     string `binding:"required"`
 	Password  string `binding:"required"`
-	Firstname string `binding:"required"`
-	Lastname  string `binding:"required"`
+	Firstname string
+	Lastname  string
 }
 
 func (u User) Save() error {
@@ -42,7 +42,7 @@ func (u User) ValidateCredentials() error {
 
 	query := `SELECT id, password FROM users WHERE email = ?`
 	data := db.DB.QueryRow(query, u.Email) // Passing query and specifying u.Email as the parameter to the query
-	err := data.Scan(&queriedPassword)
+	err := data.Scan(&u.ID, &queriedPassword)
 	if err != nil {
 		return errors.New("invalid credentials")
 	}
