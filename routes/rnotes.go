@@ -28,7 +28,7 @@ func createNote(context *gin.Context) {
 		return
 	}
 
-	err := utils.VerifyJWT(token) // verify the token
+	userId, err := utils.VerifyJWT(token) // verify the token
 	if err != nil {
 		context.JSON(http.StatusUnauthorized, gin.H{"error": "Token not verified"})
 		return
@@ -41,8 +41,8 @@ func createNote(context *gin.Context) {
 		return
 	}
 
-	note.UserID = 1
-	err = note.Save() // attempt to save the note to the database
+	note.UserID = userId // set the user id of the note to the user id of the user who created the note
+	err = note.Save()    // attempt to save the note to the database
 	if err != nil {
 		context.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to save note."})
 		return

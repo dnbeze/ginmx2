@@ -37,6 +37,6 @@ func VerifyJWT(tokenString string) (int64, error) {
 		return 0, jwt.ErrTokenInvalidClaims
 	}
 	//email := claims["email"].(string)  // get the email from the claims and define it as a string
-	userId := claims["userId"].(int64) // get the userId from the claims and define it as an int64
+	userId := int64(claims["userId"].(float64)) // set the userId from the claim as float64 then convert it to int64. jwt.MapClaims returns float64
 	return userId, nil
 }

@@ -11,7 +11,7 @@ type Note struct {
 	Body     string    `binding:"required"`
 	DateTime time.Time `binding:"required"`
 	Customer string    `binding:"required"`
-	UserID   int
+	UserID   int64
 }
 
 func (n Note) Save() error {
