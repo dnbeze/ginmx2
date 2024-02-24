@@ -14,7 +14,7 @@ type Note struct {
 	UserID   int64
 }
 
-func (n Note) Save() error {
+func (n *Note) Save() error {
 	query := `
 	INSERT INTO notes (title, body, date_time, customer, user_id) 
 	VALUES (?, ?, ?, ?, ?)` // ? is a placeholder for the actual value provides sql injection protection apparently
@@ -62,7 +62,7 @@ func GetNoteById(id int64) (*Note, error) { // *Note is a pointer to a Note for 
 	return &note, nil
 }
 
-func (n Note) UpdateNote() error {
+func (n *Note) UpdateNote() error {
 	query := `
 	UPDATE notes 
 	SET title = ?, body = ?, date_time = ?, customer = ? 
@@ -77,7 +77,7 @@ func (n Note) UpdateNote() error {
 	return err
 }
 
-func (n Note) Delete() error {
+func (n *Note) Delete() error {
 	query := `DELETE FROM notes WHERE id = ?`
 	data, err := db.DB.Prepare(query)
 	if err != nil {

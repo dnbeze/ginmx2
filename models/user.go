@@ -14,7 +14,7 @@ type User struct {
 	Lastname  string
 }
 
-func (u User) Save() error {
+func (u *User) Save() error {
 	query := `
 	INSERT INTO users (email, password, firstname, lastname) 
 	VALUES (?, ?, ?, ?)`
@@ -37,7 +37,7 @@ func (u User) Save() error {
 	return err
 }
 
-func (u User) ValidateCredentials() error {
+func (u *User) ValidateCredentials() error {
 	var queriedPassword string
 
 	query := `SELECT id, password FROM users WHERE email = ?`
