@@ -35,14 +35,14 @@ func createNote(context *gin.Context) {
 	}
 
 	var note models.Note
-	err = context.ShouldBindJSON(&note)
+	err = context.ShouldBindJSON(&note) // bind json from the request body to note struct
 	if err != nil {
 		context.JSON(http.StatusBadRequest, gin.H{"error": "Could not decode JSON"})
 		return
 	}
-	note.ID = 1
+
 	note.UserID = 1
-	err = note.Save()
+	err = note.Save() // attempt to save the note to the database
 	if err != nil {
 		context.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to save note."})
 		return
