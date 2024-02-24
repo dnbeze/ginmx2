@@ -2,6 +2,7 @@ package routes
 
 import (
 	"ginmx2/models"
+	"ginmx2/utils"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"strconv"
@@ -23,12 +24,18 @@ func getNotes(context *gin.Context) {
 func createNote(context *gin.Context) {
 	token := context.Request.Header.Get("Authorization") // get the token from the request header
 	if token == "" {                                     // if the token is empty
-		context.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		context.JSON(http.StatusUnauthorized, gin.H{"error": "Token missing"})
+		return
+	}
+
+	err := utils.VerifyJWT(token) // verify the token
+	if err != nil {
+		context.JSON(http.StatusUnauthorized, gin.H{"error": "Token not verified"})
 		return
 	}
 
 	var note models.Note
-	err := context.ShouldBindJSON(&note)
+	err = context.ShouldBindJSON(&note)
 	if err != nil {
 		context.JSON(http.StatusBadRequest, gin.H{"error": "Could not decode JSON"})
 		return
