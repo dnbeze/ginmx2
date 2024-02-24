@@ -21,16 +21,20 @@ func getNotes(context *gin.Context) {
 }
 
 func createNote(context *gin.Context) {
+	token := context.Request.Header.Get("Authorization") // get the token from the request header
+	if token == "" {                                     // if the token is empty
+		context.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		return
+	}
+
 	var note models.Note
 	err := context.ShouldBindJSON(&note)
-
 	if err != nil {
 		context.JSON(http.StatusBadRequest, gin.H{"error": "Could not decode JSON"})
 		return
 	}
 	note.ID = 1
 	note.UserID = 1
-
 	err = note.Save()
 	if err != nil {
 		context.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to save note."})
