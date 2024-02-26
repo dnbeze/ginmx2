@@ -2,7 +2,6 @@ package routes
 
 import (
 	"ginmx2/models"
-	"ginmx2/utils"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"strconv"
@@ -22,27 +21,17 @@ func getNotes(context *gin.Context) {
 }
 
 func createNote(context *gin.Context) {
-	token := context.Request.Header.Get("Authorization") // get the token from the request header
-	if token == "" {                                     // if the token is empty
-		context.JSON(http.StatusUnauthorized, gin.H{"error": "Token missing"})
-		return
-	}
-
-	userId, err := utils.VerifyJWT(token) // verify the token
-	if err != nil {
-		context.JSON(http.StatusUnauthorized, gin.H{"error": "Token not verified"})
-		return
-	}
 
 	var note models.Note
-	err = context.ShouldBindJSON(&note) // bind json from the request body to note struct
+	err := context.ShouldBindJSON(&note) // bind json from the request body to note struct
+	err = context.ShouldBindJSON(&note)  // bind json from the request body to note struct
 	if err != nil {
 		context.JSON(http.StatusBadRequest, gin.H{"error": "Could not decode JSON"})
 		return
 	}
-
-	note.UserID = userId // set the user id of the note to the user id of the user who created the note
-	err = note.Save()    // attempt to save the note to the database
+	userId := context.GetInt64("userId") // get the user id from the context
+	note.UserID = userId                 // set the user id of the note to the user id of the user who created the note
+	err = note.Save()                    // attempt to save the note to the database
 	if err != nil {
 		context.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to save note."})
 		return
