@@ -48,4 +48,17 @@ func createTables() {
 	if err != nil {
 		panic("Issue creating notes table")
 	}
+
+	createFollowTable := `
+CREATE TABLE IF NOT EXISTS follows (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER,
+    note_id INTEGER,
+    Foreign Key (note_id) REFERENCES notes(id),
+    Foreign Key (user_id) REFERENCES users(id)
+)`
+	_, err = DB.Exec(createFollowTable)
+	if err != nil {
+		panic("Issue creating follows table")
+	}
 }

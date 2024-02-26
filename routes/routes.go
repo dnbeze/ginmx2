@@ -11,11 +11,14 @@ func BuildRoutes(server *gin.Engine) {
 	server.GET("/notes/:id", getNote) // dynamic route
 
 	authenticated := server.Group("/")
-	authenticated.Use(middleware.Authenticate)     // middleware defined for group
-	authenticated.POST("/notes", createNote)       // NEW entry // protected // can register multiple request handlers for middleware
-	authenticated.PUT("/notes/:id", updateNote)    // UPDATE entry
-	authenticated.DELETE("/notes/:id", deleteNote) // DELETE entry
+	authenticated.Use(middleware.Authenticate)              // middleware defined for group
+	authenticated.POST("/notes", createNote)                // NEW entry // protected // can register multiple request handlers for middleware
+	authenticated.PUT("/notes/:id", updateNote)             // UPDATE entry
+	authenticated.DELETE("/notes/:id", deleteNote)          // DELETE entry
+	authenticated.POST("/notes/:id/follow", followNote)     // register for a note (new entry in another table)
+	authenticated.DELETE("/notes/:id/follow", unfollowNote) // unregister for a note (delete entry in another table)
 
 	server.POST("/signup", signup) // new user
 	server.POST("/login", login)   // login
+
 }

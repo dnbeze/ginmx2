@@ -87,3 +87,25 @@ func (n *Note) Delete() error {
 	_, err = data.Exec(n.ID)
 	return err
 }
+
+func (n *Note) Follow(userId int64) error {
+	query := `INSERT INTO follows (note_id, user_id) VALUES (?, ?)`
+	data, err := db.DB.Prepare(query)
+	if err != nil {
+		return err
+	}
+	defer data.Close()
+	_, err = data.Exec(n.ID, userId)
+	return err
+}
+
+func (n *Note) Unfollow(userId int64) error {
+	query := `DELETE FROM follows WHERE note_id = ? AND user_id = ?`
+	data, err := db.DB.Prepare(query)
+	if err != nil {
+		return err
+	}
+	defer data.Close()
+	_, err = data.Exec(n.ID, userId)
+	return err
+}
