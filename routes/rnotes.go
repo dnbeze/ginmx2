@@ -60,7 +60,12 @@ func updateNote(context *gin.Context) {
 		context.JSON(http.StatusBadRequest, gin.H{"error": "Invalid note id"})
 		return
 	}
-	_, err = models.GetNoteById(noteId)
+	userId := context.GetInt64("userId")    // get the user id from the context
+	note, err := models.GetNoteById(noteId) // get note by id
+	if note.UserID != userId {              // if the user id of the note does not match the user id of the user who created the note
+		context.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		return
+	}
 	if err != nil {
 		context.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch note."})
 		return
