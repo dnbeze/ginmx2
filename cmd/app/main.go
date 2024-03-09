@@ -10,7 +10,7 @@ func main() {
 	db.InitDB()
 	gin.Default()
 	server := gin.Default()
-
+	server.LoadHTMLGlob("static/*")
 	routes.BuildRoutes(server)
 	err := server.Run(":3000")
 	if err != nil {
